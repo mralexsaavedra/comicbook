@@ -1,65 +1,63 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
-export default function Home() {
+import Button from '@/components/Button'
+import Container from '@/components/Container'
+import GitHub from '@/components/Icons/GitHub'
+import Google from '@/components/Icons/Google'
+import Twitter from '@/components/Icons/Twitter'
+
+import useUser, { USER_STATES } from '@/hooks/useUser'
+
+import { loginWithGitHub, loginWithGoogle, loginWithTwitter } from '@/lib/firebase'
+
+import styles from '@/styles/Home.module.css'
+
+export default function Home () {
+  const user = useUser()
+  const router = useRouter()
+
+  useEffect(() => {
+    user && router.replace('/home')
+  }, [user])
+
+  const handleClickGitHub = () => loginWithGitHub().catch((err) => console.log(err))
+
+  const handleClickGoogle = () => loginWithGoogle().catch((err) => console.log(err))
+
+  const handleClickTwitter = () => loginWithTwitter().catch((err) => console.log(err))
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Container>
+      <section className={styles.section}>
+        <h1 className={styles.title}>Comicbook</h1>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h2 className={styles.subtitle}>
+          ¿List@ para organizar tus comics?
+        </h2>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <div className={styles.button__container}>
+          {user === USER_STATES.NOT_LOGGED && (
+            <div className={styles.buttons}>
+              <Button onClick={handleClickGitHub}>
+                <GitHub fill='#fff' width={24} height={24} />
+                Login with GitHub
+              </Button>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+              <Button onClick={handleClickGoogle}>
+                <Google width={24} height={24} />
+                Login with Google
+              </Button>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+              <Button onClick={handleClickTwitter}>
+                <Twitter width={24} height={24} />
+                Login with Twitter
+              </Button>
+            </div>
+          )}
+          {user === USER_STATES.NOT_KNOWN && <img src='/vercel.svg' width={100} />}
         </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+      </section>
+    </Container>
   )
 }
